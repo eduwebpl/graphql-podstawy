@@ -2,25 +2,50 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from "react-bootstrap/Button";
 import {Link} from "react-router-dom";
+import { gql, useQuery } from '@apollo/client';
+import {BookFragments} from '../graphql-services/book.fragments';
+
+const BOOK_QUERY = gql`
+    query getBook {
+        books: getBooks {
+            ...CommonBook
+        }
+    }
+    ${BookFragments.commonBook}
+`;
 
 export default function BookList() {
-    const cards = [
-        {
-            id: '1',
-            title: 'Mock book 1',
-            author: 'Joe Doe'
-        },
-        {
-            id: '1',
-            title: 'Mock book 2',
-            author: 'Joe Doe'
-        },
-        {
-            id: '1',
-            title: 'Mock book 3',
-            author: 'Joe Doe'
+    const { data, loading, error } = useQuery(BOOK_QUERY);
+
+    if (loading) {
+        return 'loading...';
+    }
+    
+    if (error) {
+        return 'Something went wrong!'
+    }
+    
+    const cards = data.books.map(book => {
+        const { title, id, authors } = book;
+        
+        const author = authors.reduce((acc, author) => {
+            let authorName = `${author.firstName} ${author.lastName}`;
+            
+            if (acc.length) {
+                acc += `, ${authorName}`
+            } else {
+                acc += authorName
+            }
+            
+            return acc;
+        }, '')
+        
+        return { 
+            title,
+            id,
+            author
         }
-    ]
+    });
 
     return (
         <>
