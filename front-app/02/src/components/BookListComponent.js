@@ -3,15 +3,18 @@ import Card from 'react-bootstrap/Card';
 import Button from "react-bootstrap/Button";
 import {Link} from "react-router-dom";
 import { gql, useQuery } from '@apollo/client';
-import {BookFragments} from '../graphql-services/book.fragments';
 
 const BOOK_QUERY = gql`
     query getBook {
         books: getBooks {
-            ...CommonBook
+            id
+            title
+            authors {
+                firstName
+                lastName
+            }
         }
     }
-    ${BookFragments.commonBook}
 `;
 
 export default function BookList() {
