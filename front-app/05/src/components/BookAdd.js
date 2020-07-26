@@ -2,12 +2,41 @@ import React, {useState} from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import { gql, useMutation } from '@apollo/client';
+
+const ADD_BOOK = gql`
+    mutation addBook($bookDetails: BookInput) {
+        addBook(bookDetails: $bookDetails) {
+            id
+        }
+    }
+`;
 
 export function BookAdd() {
   const [bookAdded, setBookAdded] = useState(false);
+  const [addBook] = useMutation(ADD_BOOK, {
+      onCompleted: () => {
+          setBookAdded(true);
+      }
+  });
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const {bookTitle, bookAuthorsIds} = event.target.elements;
+    const ids = bookAuthorsIds.value.replace(' ', '').split(',');
+
+    addBook({
+        variables: {
+            bookDetails: {
+                title: bookTitle.value,
+                authors: {
+                    connect: {
+                        ids
+                    }
+                }
+            }
+        }
+    });
   }
 
   return (

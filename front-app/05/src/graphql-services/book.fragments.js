@@ -6,6 +6,7 @@ export const BookFragments = {
             id
             title
             authors {
+                id
                 firstName
                 lastName
             }
